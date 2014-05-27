@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<title>...</title>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<link rel="stylesheet" type="text/css" href="css/style.css">
+	<script src="http://code.jquery.com/jquery-1.10.2.js"></script>
+</head>
+
+<body>
+	<strong>Kegler:</strong><br>
+	<?php 
+		$obj=new Kegler();
+		// Erstes Ausgeben der Tabelle. Sobald ein Button geklickt
+		// ist erfolgt der Aufruf der read-Methode in der Klasse.
+		if(!isset($_GET['button'])){
+			$obj->read();
+		} 
+	/******* Class ***************************/
+		class Kegler {
+			public function read(){
+				include('connect.php');
+				$sql="SELECT name FROM spieler";
+				foreach($db->query($sql) as $row){
+					echo '<div class="ausgabe">' . $row['name'] . '</div>';
+				}
+			}
+			public function read_datensatz($a){
+				include('connect.php');
+				$sql="SELECT * FROM spieler WHERE name='$a'";
+				echo "Datensatz von " . $a . " :<br>";
+				foreach($db->query($sql) as $row){
+					echo '<div class="ausgabe">' . $row['id'] . '</div>';
+					echo '<div class="ausgabe">' . $row['name'] . '</div>';
+					echo '<div class="ausgabe">' . $row['email'] . '</div>';
+					echo '<div class="ausgabe">' . $row['geb'] . '</div>';
+				}
+			}
+			public function create($a){
+				include('connect.php');
+				$sql="INSERT INTO spieler(name) VALUES ('$a')";
+				$db->exec($sql);
+				$this->read();
+			}
+			public function delete($a){
+				include('connect.php');
+				$sql="DELETE FROM spieler WHERE name='$a'";
+				$db->exec($sql);
+				$this->read();
+			}
+			public function update($a,$b){
+				include('connect.php');
+				$sql="UPDATE spieler SET name='$b' WHERE name='$a'";
+				$db->exec($sql);
+				$this->read();
+			}
+		}
+		// Wurde auf einen Button geklickt? Button-Klick schreibt
+		// Daten in URL
+		if(isset($_GET['button'])){
+			switch($_GET['button']){
+				case 1:$obj->create($_GET['name']);break;
+				case 2:$obj->read_datensatz($_GET['name']);break;
+				case 3:$obj->update($_GET['name'],$_GET['nameupdate']);break;
+				case 4:$obj->delete($_GET['name']);break;
+			}
+		}
+	?>
+
+	<form action="#">
+		<br>
+		<label for="na">Name:</label>
+		<input type="text" name="name" id="na">
+		<label for="up">Update:</label>
+		<input type="text" name="nameupdate" id="up">
+		<br>
+		<button type="input" name="button" value="1">Create</button>
+		<button type="input" name="button" value="4">Delete</button>
+		<button type="input" name="button" value="3">Update</button>
+		<button type="input" name="button" value="2">Read</button>
+	</form>
+	
+</body>
+
+</html>
